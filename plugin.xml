@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="de.fastr.phonegap.plugins.downloader" version="0.1.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="de.fastr.phonegap.plugins.downloader" version="0.1.1">
 	<name>DownloadAssistent</name>
 	<author>Fabian Strachanski</author>
 	<description>Downloads files to persistant Storage on your Phone, checks md5sum if you want, unzips packed files if necassary (For Android and ios)</description>
@@ -13,7 +13,7 @@
 	<dependency id="org.chromium.zip" version="2.1.0" />
 	<dependency id="de.fastr.phonegap.plugins.md5chksum" version="0.1.3" />	
 
-	<js-module src="www/downloader.js" name="downloader">
+	<js-module src="www/downloader.min.js" name="downloader">
 		<clobbers target="downloader" />
 	</js-module>
 </plugin>

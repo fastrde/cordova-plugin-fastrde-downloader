@@ -56,6 +56,8 @@ var Downloader = {
   autoDelete: true,
   /** @type {boolean} */
   autoCheck: false,
+  /** @type {boolean} */
+  noMedia: true,
   /** @type {boolean} */  
   loading: false,
   /** @type {boolean} */
@@ -78,6 +80,9 @@ var Downloader = {
     }
     if (typeof options.wifiOnly != 'undefined'){
       Downloader.setWifiOnly(options.wifiOnly);
+    }
+    if (typeof options.noMedia != 'undefined'){
+      Downloader.setNoMedia(options.noMedia);
     }
 
     document.addEventListener("DOWNLOADER_gotFileSystem",    Downloader.onGotFileSystem,   false);
@@ -289,6 +294,14 @@ var Downloader = {
     return false;
   },
 
+  /**
+   * returns true if automatic md5sum compare is enabled
+   * @param {String} fileName
+   * @returns {boolean}
+   */
+  isNoMedia: function(){
+    return Downloader.noMedia;
+  },
 
 /*************************************************************** setter */
 
@@ -306,6 +319,14 @@ var Downloader = {
    */
   setWifiOnly: function(wifionly){
     Downloader.wifiOnly = wifionly;
+  },
+
+  /**
+   * if set, ".nomedia" file on android is generated which prevent gallery from scanning directory
+   * @param {boolean} wifionly
+   */
+  setNoMedia: function(noMedia){
+    Downloader.noMedia = noMedia;
   },
 
   /**
@@ -360,7 +381,17 @@ var Downloader = {
       document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
     });
   },
-
+  touchNoMedia: function(){
+    var folder = Downloader.localFolder;
+    folder.getFile(".nomedia", {
+        create : true,
+        exclusive : false
+      }, function onTouchNoMediaFile(entry){
+        
+      }, function onTouchNoMediaFileError(error) {
+        document.dispatchEvent(createEvent("DOWNLOADER_getFileError", [error]));
+      });  
+  },
 /*************************************************************** EventHandler */
 
   /**
@@ -421,6 +452,9 @@ var Downloader = {
     var folder = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
     Downloader.localFolder = folder;
     Downloader.initialized = true;
+    if (Downloader.isNoMedia()){
+      Downloader.touchNoMedia();
+    } 
     //console.log("initialized " + Downloader.localFolder.toURL());
     document.dispatchEvent(createEvent("DOWNLOADER_initialized"));
   },

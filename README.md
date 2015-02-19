@@ -1,6 +1,9 @@
 # phonegap-downloader
 Phonegap plugin to download a List of files or a single file to the Phone, check consistency and unzip if necessary (Android and ios)
 
+## Changes 0.1.1 -> 0.1.2
+- noMedia flag in init options to prevent gallery from scanning download folder
+
 ## install
 ```
 yourAppDir$ phonegap plugin add https://github.com/fastrde/phonegap-downloader.git
@@ -19,6 +22,7 @@ options:
 - **unzip**: *true* -> unzip after download is enabled [default: *false*]
 - **check**: *true* -> md5sum of file is checked after download [default: *false*]
 - **delete**: *true* -> delete after unpack a zipfile [default: *true*]
+- **noMedia**: *true* -> prevent gallery from scan files on android [default: *true*]
 - **wifiOnly**: *true* -> only Download when connected to Wifi, else fires ``DOWNLOADER_noWifiConnection`` event [default: *false*]
 
 ###Download single file
@@ -92,7 +96,7 @@ downloader.get("http://yourhost.de/some.zip", "3f4ea2219aa321ef5cd3143ea33076ab"
 ### Download multiple zip-files to testApp, check if md5sum matches given string and extract it and delete it afterwards
 ```javascript
 downloader.init({folder: "testApp", unzip: true, check: true});
-downloader.get([
+downloader.getMultipleFiles([
   {url: "http://yourhost.de/some1.zip", md5:"1f4ea2219aa321ef5cd3143ea33076ac"},
   {url: "http://yourhost.de/some2.zip", md5:"2f4ea2219aa321ef5cd3143ea33076ad"},
   {url: "http://yourhost.de/some3.zip", md5:"3f4ea2219aa321ef5cd3143ea33076ae"}

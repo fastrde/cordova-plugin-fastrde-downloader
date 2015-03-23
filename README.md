@@ -1,6 +1,8 @@
 # phonegap-downloader
 Phonegap plugin to download a List of files or a single file to the Phone, check consistency and unzip if necessary (Android and ios)
 
+## Changes 0.1.2 -> 0.1.3
+- Unzipping is now queue based like the download porgress.
 ## Changes 0.1.1 -> 0.1.2
 - noMedia flag in init options to prevent gallery from scanning download folder
 

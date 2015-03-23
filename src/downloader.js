@@ -43,11 +43,15 @@ var Downloader = {
   /** @type {org.apache.cordova.file.FileSystem} */
   fileSystem: null,
   /** @type {Array.<FileObjects>} */
+  unzipQueue: [],
+  /** @type {Array.<FileObjects>} */
   downloadQueue : [],
   /** @type {Array.<FileObjects>} */
   fileObjects:[],
   /** @type {FileObject} */  
   fileObjectInProgress: null,
+  /** @type {FileObject} */  
+  fileObjectInUnzipProgress: null,
   /** @type {boolean} */
   wifiOnly: false,
   /** @type {boolean} */
@@ -60,6 +64,8 @@ var Downloader = {
   noMedia: true,
   /** @type {boolean} */  
   loading: false,
+  /** @type {boolean} */  
+  unzipping: false,
   /** @type {boolean} */
   initialized: false,
 
@@ -119,6 +125,17 @@ var Downloader = {
   },
 
   /**
+   * Adds a File to the unzipQueue and triggers the upzip when no file is in progress
+   * @param {String} fileName 
+   */
+  unzip: function (fileName){
+    Downloader.unzipQueue.push(fileName);
+    if (!Downloader.isUnzipping()){
+      Downloader.unzipNextInQueue();
+    }
+  },
+
+  /**
    * loads the next file in the downloadQueue
    * @returns {boolean}
    */
@@ -128,6 +145,20 @@ var Downloader = {
       var fileObject = Downloader.downloadQueue.shift();
       Downloader.fileObjectInProgress = fileObject;
       Downloader.transferFile(fileObject);
+      return true;
+    }
+    return false;
+  },
+  /**
+   * unzips the next file in the unzipQueue
+   * @returns {boolean}
+   */
+  unzipNextInQueue: function(){
+    if (Downloader.unzipQueue.length > 0){
+      Downloader.unzipping = true;
+      var fileObject = Downloader.unzipQueue.shift();
+      Downloader.fileObjectInUnzipProgress = fileObject;
+      Downloader._unzip(fileObject);
       return true;
     }
     return false;
@@ -157,7 +188,7 @@ var Downloader = {
    * @param {String} fileName
    */
   //TODO: full fileEntry as param? not only fileName
-  unzip : function(fileName) {
+  _unzip : function(fileName) {
     var folderUrl = Downloader.localFolder.toURL();
     zip.unzip(folderUrl + "/" + fileName, folderUrl, function(code) {
       if (code == 0){
@@ -226,6 +257,14 @@ var Downloader = {
    */
   isLoading: function(){
     return Downloader.loading;
+  },
+
+  /**
+   * returns true if a unzip is in progress
+   * @returns {boolean}
+   */
+  isUnzipping: function(){
+    return Downloader.unzipping;
   },
 
   /**
@@ -419,6 +458,10 @@ var Downloader = {
     if (Downloader.isAutoDelete()){
       Downloader.removeFile(fileName);
     }
+		if(!Downloader.unzipNextInQueue()){
+			Downloader.unzipping = false;
+			Downloader.fileObjectInUnzipProgress = null;
+		}
   },
 
   /**

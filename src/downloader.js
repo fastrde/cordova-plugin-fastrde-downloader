@@ -79,7 +79,7 @@ var Downloader = {
       Downloader.setAutoUnzip(options.unzip);
     }
     if (typeof options.delete != 'undefined'){
-      Downloader.setDelteAfterUnzip(options.delete);
+      Downloader.setDeleteAfterUnzip(options.delete);
     }
     if (typeof options.check != 'undefined'){
       Downloader.setAutoCheck(options.check);
@@ -388,7 +388,7 @@ var Downloader = {
    * if set to true zip-files get removed after extracting
    * @param {boolean} unzip
    */
-  setDelteAfterUnzip: function(del){
+  setDeleteAfterUnzip: function(del){
     Downloader.autoDelete = del;
   },
 
@@ -562,6 +562,26 @@ var Downloader = {
         Downloader.load(fileObject.url, fileObject.md5);
       }
     },
+		isInitialized: function(){
+			return Downloader.isInitialized();
+		},
+  	setWifiOnly: function(wifionly){
+    	Downloader.setWifiOnly(wifionly);
+  	},  
+  	setNoMedia: function(noMedia){
+    	Downloader.setNoMedia(noMedia);
+  	},  
+  	setAutoUnzip: function(unzip){
+    	Downloader.setAutoUnzip(unzip);
+  	},  
+  	setAutoCheck: function(check){
+    	Downloader.setAutoCheck(check);
+  	},  
+  	setDeleteAfterUnzip: function(del){
+    	Downloader.setDeleteAfterUnzip(del);
+  	},  
+
+	 	
   }
 };
 

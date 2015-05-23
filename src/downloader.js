@@ -40,6 +40,8 @@ function createEvent(name, data){
 var Downloader = {
   /** @type {org.apache.cordova.file.FileEntry} */
   localFolder : null,
+  /** @type {String} */
+  fileSystemURL: null,
   /** @type {org.apache.cordova.file.FileSystem} */
   fileSystem: null,
   /** @type {Array.<FileObjects>} */
@@ -89,6 +91,9 @@ var Downloader = {
     }
     if (typeof options.noMedia != 'undefined'){
       Downloader.setNoMedia(options.noMedia);
+    }
+    if (typeof options.fileSystem != 'undefined'){
+      Downloader.fileSystemURL = options.fileSystem;
     }
 
     document.addEventListener("DOWNLOADER_gotFileSystem",    Downloader.onGotFileSystem,   false);
@@ -398,25 +403,39 @@ var Downloader = {
    * gets the persistent FileSystem
    */
   getFilesystem : function() {
-    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-      document.dispatchEvent(createEvent("DOWNLOADER_gotFileSystem", [fileSystem]));
-    }, function(error) {
-      document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
-    });
+    if (Downloader.fileSystemURL){
+      console.log("Using fileSystemURL:" + Downloader.fileSystemURL);
+      window.resolveLocalFileSystemURI(Downloader.fileSystemURL, function(rootfolder) {
+        document.dispatchEvent(createEvent("DOWNLOADER_gotFileSystem", [rootfolder]));
+      }, function(error) {
+        document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
+      });
+    }else{
+      console.log("Fallback to Persistant Filesystem");
+      window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+      window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+        document.dispatchEvent(createEvent("DOWNLOADER_gotFileSystem", [fileSystem.root]));
+      }, function(error) {
+        document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
+      });
+    }
   },
+
+  
 
   /**
    * @param {org.apache.cordova.file.FileSystem} fileSystem
    * @param {String} folderName
    */
   getFolder : function(fileSystem, folderName) {
-    fileSystem.root.getDirectory(folderName, {
+    fileSystem.getDirectory(folderName, {
       create : true,
       exclusive : false
     }, function(folder) {
+      console.log("getFolder->Success:" + folder.fullPath + " : " + folder.name);
       document.dispatchEvent(createEvent("DOWNLOADER_gotFolder", [folder]));
     }, function(error) {
+      console.log("getFolder->Error");
       document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
     });
   },

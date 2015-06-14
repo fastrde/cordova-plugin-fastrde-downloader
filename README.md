@@ -22,6 +22,7 @@ downloader.init({folder: "yourPersistantAppFolder", unzip: true});
 options:
 
 - **folder**: folder to store downloads in [required]
+- **fileSystem**: fileSystem to store downloads in (use cordova.file.* to be platform independent)
 - **unzip**: *true* -> unzip after download is enabled [default: *false*]
 - **check**: *true* -> md5sum of file is checked after download [default: *false*]
 - **delete**: *true* -> delete after unpack a zipfile [default: *true*]

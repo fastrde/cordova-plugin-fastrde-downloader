@@ -59,7 +59,7 @@ var Downloader = {
   /** @type {boolean} */
   autoUnzip: false,
   /** @type {boolean} */
-  autoDelete: true,
+  autoRemove: true,
   /** @type {boolean} */
   autoCheck: false,
   /** @type {boolean} */
@@ -80,8 +80,8 @@ var Downloader = {
     if (typeof options.unzip != 'undefined'){
       Downloader.setAutoUnzip(options.unzip);
     }
-    if (typeof options.delete != 'undefined'){
-      Downloader.setDeleteAfterUnzip(options.delete);
+    if (typeof options.remove != 'undefined'){
+      Downloader.setRemoveAfterUnzip(options.remove);
     }
     if (typeof options.check != 'undefined'){
       Downloader.setAutoCheck(options.check);
@@ -110,6 +110,7 @@ var Downloader = {
    * @param {?String} md5
    */
   load: function (url, md5){
+		//console.log("loading "+url);
     md5 = md5 || null;
     if (!Downloader.isInitialized()){
       document.addEventListener("DOWNLOADER_initialized", function onInitialized(event){
@@ -127,6 +128,7 @@ var Downloader = {
     if (!Downloader.isLoading()){
       Downloader.loadNextInQueue();
     }
+		return fileObject.name;
   },
 
   /**
@@ -243,7 +245,7 @@ var Downloader = {
     folder.getFile(fileName, {
         create : false,
         exclusive : false
-      }, function onGotFileToDelete(entry){
+      }, function onGotFileToRemove(entry){
         entry.remove(function onRemoved(){
           document.dispatchEvent(createEvent("DOWNLOADER_fileRemoved", [entry]));
         }, function onRemoveError(){
@@ -300,8 +302,8 @@ var Downloader = {
    * returns true if automatic deletion after unzipping is enabled
    * @returns {boolean}
    */
-  isAutoDelete: function(){
-    return Downloader.autoDelete;
+  isAutoRemove: function(){
+    return Downloader.autoRemove;
   },
 
   /**
@@ -393,8 +395,8 @@ var Downloader = {
    * if set to true zip-files get removed after extracting
    * @param {boolean} unzip
    */
-  setDeleteAfterUnzip: function(del){
-    Downloader.autoDelete = del;
+  setRemoveAfterUnzip: function(del){
+    Downloader.autoRemove = del;
   },
 
 /*************************************************************** getter */
@@ -474,7 +476,7 @@ var Downloader = {
    */
   onUnzipSuccess : function(event) {
     var fileName = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
-    if (Downloader.isAutoDelete()){
+    if (Downloader.isAutoRemove()){
       Downloader.removeFile(fileName);
     }
 		if(!Downloader.unzipNextInQueue()){
@@ -530,7 +532,7 @@ var Downloader = {
      *   - folder: sets folder to store downloads [required]
      *   - unzip: true -> unzip after download is enabled [default: false]
      *   - check: true -> md5sum of file is checked after download [default: false]
-     *   - delete: true -> delete after unpack a zipfile [default: true]
+     *   - remove: true -> remove after unpack a zipfile [default: true]
      *   - wifiOnly: true -> only Download when connected to Wifi, else fire "DOWNLOADER_noWifiConnection" event [default: false]
      */
     init: function(options){
@@ -561,7 +563,7 @@ var Downloader = {
         document.dispatchEvent(createEvent("DOWNLOADER_noWifiConnection"));
         return;
       }
-      Downloader.load(url, md5);
+      return Downloader.load(url, md5);
     },
     /**
      * downloads multiple Files in a row
@@ -596,8 +598,8 @@ var Downloader = {
   	setAutoCheck: function(check){
     	Downloader.setAutoCheck(check);
   	},  
-  	setDeleteAfterUnzip: function(del){
-    	Downloader.setDeleteAfterUnzip(del);
+  	setRemoveAfterUnzip: function(del){
+    	Downloader.setRemoveAfterUnzip(del);
   	},  
 
 	 	

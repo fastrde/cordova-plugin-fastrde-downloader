@@ -76,6 +76,7 @@ var Downloader = {
    * @param {Object.<String>} options
    */
   initialize: function(options){
+		//console.log("initialize");
     Downloader.setFolder(options.folder);
     if (typeof options.unzip != 'undefined'){
       Downloader.setAutoUnzip(options.unzip);
@@ -96,11 +97,14 @@ var Downloader = {
       Downloader.fileSystemURL = options.fileSystem;
     }
 
+		//console.log("setting Listener");
+    document.addEventListener("DOWNLOADER_downloadError",    Downloader.onDownloadError,   false);
     document.addEventListener("DOWNLOADER_gotFileSystem",    Downloader.onGotFileSystem,   false);
     document.addEventListener("DOWNLOADER_gotFolder",        Downloader.onGotFolder,       false);
     document.addEventListener("DOWNLOADER_downloadSuccess",  Downloader.onDownloadSuccess, false);
     document.addEventListener("DOWNLOADER_unzipSuccess",     Downloader.onUnzipSuccess,    false);
     document.addEventListener("DOWNLOADER_fileCheckSuccess", Downloader.onCheckSuccess,    false);
+		//console.log("getting filesystem");
     Downloader.getFilesystem();
   },
 
@@ -110,10 +114,13 @@ var Downloader = {
    * @param {?String} md5
    */
   load: function (url, md5){
+		//console.log("load");
 		//console.log("loading "+url);
     md5 = md5 || null;
     if (!Downloader.isInitialized()){
+			//console.log("wait for initialization");
       document.addEventListener("DOWNLOADER_initialized", function onInitialized(event){
+				//console.log("initialization done");
         event.target.removeEventListener("DOWNLOADER_initialized", onInitialized, false);
         Downloader.load(url, md5);
       }, false);
@@ -175,6 +182,7 @@ var Downloader = {
    * @param {FileObject} fileObject
    */
   transferFile : function(fileObject) {
+		//console.log("tranfserFile");
     var filePath = Downloader.localFolder.toURL() + "/" + fileObject.name;
     var transfer = new FileTransfer();
     transfer.onprogress = function(progressEvent) {
@@ -398,6 +406,20 @@ var Downloader = {
   setRemoveAfterUnzip: function(del){
     Downloader.autoRemove = del;
   },
+	/**
+	 * resets status-variables to get a fresh downloader after error
+   */
+	reset: function(){
+		//console.log("resetting");
+		Downloader.downloadQueue = [];
+		Downloader.unzipQueue = [];
+  	Downloader.fileObjects = [];
+  	Downloader.fileObjectInProgress =  null;
+  	Downloader.fileObjectInUnzipProgress= null;
+  	Downloader.initialized = false;
+		Downloader.loading = false;
+		Downloader.unzipping = false;
+	},
 
 /*************************************************************** getter */
 
@@ -406,14 +428,14 @@ var Downloader = {
    */
   getFilesystem : function() {
     if (Downloader.fileSystemURL){
-      console.log("Using fileSystemURL:" + Downloader.fileSystemURL);
+      //console.log("Using fileSystemURL:" + Downloader.fileSystemURL);
       window.resolveLocalFileSystemURI(Downloader.fileSystemURL, function(rootfolder) {
         document.dispatchEvent(createEvent("DOWNLOADER_gotFileSystem", [rootfolder]));
       }, function(error) {
         document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
       });
     }else{
-      console.log("Fallback to Persistant Filesystem");
+      //console.log("Fallback to Persistant Filesystem");
       window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
       window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
         document.dispatchEvent(createEvent("DOWNLOADER_gotFileSystem", [fileSystem.root]));
@@ -434,10 +456,10 @@ var Downloader = {
       create : true,
       exclusive : false
     }, function(folder) {
-      console.log("getFolder->Success:" + folder.fullPath + " : " + folder.name);
+      //console.log("getFolder->Success:" + folder.fullPath + " : " + folder.name);
       document.dispatchEvent(createEvent("DOWNLOADER_gotFolder", [folder]));
     }, function(error) {
-      console.log("getFolder->Error");
+      //console.log("getFolder->Error");
       document.dispatchEvent(createEvent("DOWNLOADER_error", [error]));
     });
   },
@@ -470,7 +492,19 @@ var Downloader = {
       Downloader.fileObjectInProgress = null;
     }
   },
-
+	/**
+	 * @param {Object} event
+   */
+  onDownloadError: function(event) {
+		Downloader.reset();
+		//console.log("onDownloadError remove listener");
+    document.removeEventListener("DOWNLOADER_onDownloadError",    Downloader.onDownloadError,   false);
+    document.removeEventListener("DOWNLOADER_gotFileSystem",    Downloader.onGotFileSystem,   false);
+    document.removeEventListener("DOWNLOADER_gotFolder",        Downloader.onGotFolder,       false);
+    document.removeEventListener("DOWNLOADER_downloadSuccess",  Downloader.onDownloadSuccess, false);
+    document.removeEventListener("DOWNLOADER_unzipSuccess",     Downloader.onUnzipSuccess,    false);
+    document.removeEventListener("DOWNLOADER_fileCheckSuccess", Downloader.onCheckSuccess,    false);
+	},
   /**
    * @param {Object} event
    */
@@ -512,6 +546,7 @@ var Downloader = {
    * @param {org.apache.cordova.file.FileEntry} folder
    */
   onGotFolder : function(event){ 
+		//console.log("onGotFolder");
     event.target.removeEventListener(event.name, Downloader.onGotFolder);
     var folder = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
     Downloader.localFolder = folder;

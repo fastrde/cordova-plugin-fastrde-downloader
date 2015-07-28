@@ -1,6 +1,12 @@
 # phonegap-downloader
 Phonegap plugin to download a List of files or a single file to the Phone, check consistency and unzip if necessary (Android and ios)
 
+## Changes 0.1.4 -> 0.1.5
+ - Fix for issue #2 new initialization after download-error works properly now. 
+
+## Changes 0.1.3 -> 0.1.4
+- fixed an issue with older javascript versions and reserved words.
+
 ## Changes 0.1.2 -> 0.1.3
 - Unzipping is now queue based like the download porgress.
 

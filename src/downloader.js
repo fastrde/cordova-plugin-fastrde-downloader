@@ -38,11 +38,11 @@ function createEvent(name, data){
 };
 
 var Downloader = {
-  /** @type {org.apache.cordova.file.FileEntry} */
+  /** @type {cordova-plugin-file.FileEntry} */
   localFolder : null,
   /** @type {String} */
   fileSystemURL: null,
-  /** @type {org.apache.cordova.file.FileSystem} */
+  /** @type {cordova-plugin-file.FileSystem} */
   fileSystem: null,
   /** @type {Array.<FileObjects>} */
   unzipQueue: [],
@@ -361,7 +361,7 @@ var Downloader = {
 
   /**
    * sets the Folder for storing the downloads
-   * @param {org.apache.cordova.file.FileEntry} folder
+   * @param {cordova-plugin-file.FileEntry} folder
    */
   setFolder: function(folder){
     Downloader.localFolder = folder;
@@ -448,7 +448,7 @@ var Downloader = {
   
 
   /**
-   * @param {org.apache.cordova.file.FileSystem} fileSystem
+   * @param {cordova-plugin-file.File.FileSystem} fileSystem
    * @param {String} folderName
    */
   getFolder : function(fileSystem, folderName) {
@@ -480,7 +480,7 @@ var Downloader = {
    * @param {Object} event
    */
   onDownloadSuccess : function(event) {
-    var entry = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
+    var entry = /** @type {cordova-plugin-file.FileEntry} */ event.data[0];
     if (Downloader.isAutoCheck()){
       var md5 = Downloader.fileObjectInProgress.md5;
       Downloader.check(entry.name, md5);
@@ -509,7 +509,7 @@ var Downloader = {
    * @param {Object} event
    */
   onUnzipSuccess : function(event) {
-    var fileName = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
+    var fileName = /** @type {cordova-plugin-file.FileEntry} */ event.data[0];
     if (Downloader.isAutoRemove()){
       Downloader.removeFile(fileName);
     }
@@ -536,19 +536,19 @@ var Downloader = {
    */
   onGotFileSystem : function(event){ 
     event.target.removeEventListener(event.name, Downloader.onGotFileSystem);
-    var fileSystem = /** @type {org.apache.cordova.file.FileSystem} */ event.data[0];
+    var fileSystem = /** @type {cordova-plugin-file.File.FileSystem} */ event.data[0];
     Downloader.fileSystem = fileSystem;
     Downloader.getFolder(fileSystem, Downloader.localFolder);
   },
 
   /**
    * @param {Object} event
-   * @param {org.apache.cordova.file.FileEntry} folder
+   * @param {cordova-plugin-file.FileEntry} folder
    */
   onGotFolder : function(event){ 
 		//console.log("onGotFolder");
     event.target.removeEventListener(event.name, Downloader.onGotFolder);
-    var folder = /** @type {org.apache.cordova.file.FileEntry} */ event.data[0];
+    var folder = /** @type {cordova-plugin-file.FileEntry} */ event.data[0];
     Downloader.localFolder = folder;
     Downloader.initialized = true;
     if (Downloader.isNoMedia()){

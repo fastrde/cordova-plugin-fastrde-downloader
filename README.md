@@ -1,8 +1,11 @@
 # phonegap-downloader
 Phonegap plugin to download a List of files or a single file to the Phone, check consistency and unzip if necessary (Android and ios)
 
-## Changes 0.1.5 -> 0.2.0
+## Changes 0.2.0 -> 0.2.1
  - Added downloader.abort() function to abort downloads in progress.
+
+## Changes 0.1.5 -> 0.2.0
+ - move to new cordova plugin registry
 
 ## Changes 0.1.4 -> 0.1.5
  - Fix for issue #2 new initialization after download-error works properly now. 

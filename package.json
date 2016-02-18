@@ -1,0 +1,30 @@
+{
+  "name": "cordova-plugin-fastrde-downloader",
+  "version": "0.2.1",
+  "description": "Downloads files to persistant Storage on your Phone, checks md5sum if you want, unzips packed files if necassary (For Android and iOS)",
+  "cordova": {
+    "id": "cordova-plugin-fastrde-downloader",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fastrde/cordova-plugin-fastrde-downloader"
+  },
+  "keywords": [
+    "cordova",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+		"file",
+		"download",
+		"downloader",
+		"multiple",
+		"md5",
+    "unzip"
+  ],
+  "author": "Fabian Strachanski",
+  "license": "MIT"
+}

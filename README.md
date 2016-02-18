@@ -1,6 +1,9 @@
 # phonegap-downloader
 Phonegap plugin to download a List of files or a single file to the Phone, check consistency and unzip if necessary (Android and ios)
 
+## Changes 0.1.5 -> 0.2.0
+ - Added downloader.abort() function to abort downloads in progress.
+
 ## Changes 0.1.4 -> 0.1.5
  - Fix for issue #2 new initialization after download-error works properly now. 
 
@@ -49,6 +52,12 @@ downloader.getMultipleFiles([
   {url:"http://yourhost.de/some2.zip"},
   {url:"http://yourhost.de/some3.zip"}
 ]);
+```
+###Abort download in progress
+You have to re-init downloader after aborting an transfer
+
+```javascript
+downloader.abort();
 ```
 
 ###Events
@@ -101,6 +110,14 @@ downloader.get("http://yourhost.de/some.zip");
 ```javascript
 downloader.init({folder: "testApp", unzip: true, check: true});
 downloader.get("http://yourhost.de/some.zip", "3f4ea2219aa321ef5cd3143ea33076ab");
+```
+### Download file abort.zip and abort download, the download another.zip
+```javascript
+downloader.init({folder: "testApp", unzip: true, check: true});
+downloader.get("http://yourhost.de/abort.zip");
+downloader.abort();
+downloader.init({folder: "testApp", unzip: true, check: true});
+downloader.get("http://yourhost.de/another.zip");
 ```
 
 ### Download multiple zip-files to testApp, check if md5sum matches given string and extract it and delete it afterwards

@@ -70,6 +70,8 @@ var Downloader = {
   unzipping: false,
   /** @type {boolean} */
   initialized: false,
+  /** @type {FileTransfer} */
+	transfer: null,
 
   /**
    * prepare Downloader
@@ -137,6 +139,17 @@ var Downloader = {
     }
 		return fileObject.name;
   },
+	
+	/**
+   * Aborts current in-progress transfer and empties the queue
+   */
+	abort: function(){
+		if (Downloader.transfer !== null){
+			Downloader.transfer.abort();
+			Downloader.transfer = null;
+		}
+		Downloader.reset();
+	},
 
   /**
    * Adds a File to the unzipQueue and triggers the upzip when no file is in progress
@@ -163,6 +176,7 @@ var Downloader = {
     }
     return false;
   },
+
   /**
    * unzips the next file in the unzipQueue
    * @returns {boolean}
@@ -184,14 +198,14 @@ var Downloader = {
   transferFile : function(fileObject) {
 		//console.log("tranfserFile");
     var filePath = Downloader.localFolder.toURL() + "/" + fileObject.name;
-    var transfer = new FileTransfer();
-    transfer.onprogress = function(progressEvent) {
+    Downloader.transfer = new FileTransfer();
+    Downloader.transfer.onprogress = function(progressEvent) {
       if (progressEvent.lengthComputable) {
         var percentage = Math.floor(progressEvent.loaded / progressEvent.total * 100);
         document.dispatchEvent(createEvent("DOWNLOADER_downloadProgress", [percentage, fileObject.name]));
       }
     };
-    transfer.download(fileObject.url, filePath, function(entry) {
+    Downloader.transfer.download(fileObject.url, filePath, function(entry) {
       document.dispatchEvent(createEvent("DOWNLOADER_downloadSuccess", [entry]));
     }, function(error) {
       document.dispatchEvent(createEvent("DOWNLOADER_downloadError", [error]));
@@ -561,6 +575,8 @@ var Downloader = {
 /*************************************************************** API */
 
   interface : {
+		obj: null,
+
     /**
      * initializes the downloader
      * @param {Object} options
@@ -577,6 +593,7 @@ var Downloader = {
       }
       options = options || {};
       Downloader.initialize(options);
+			Downloader.interface.obj = Downloader;
     },
     
     /**
@@ -618,6 +635,9 @@ var Downloader = {
         Downloader.load(fileObject.url, fileObject.md5);
       }
     },
+		abort: function(){
+			Downloader.abort();
+		},
 		isInitialized: function(){
 			return Downloader.isInitialized();
 		},
@@ -635,9 +655,7 @@ var Downloader = {
   	},  
   	setRemoveAfterUnzip: function(del){
     	Downloader.setRemoveAfterUnzip(del);
-  	},  
-
-	 	
+  	}  
   }
 };
 
